@@ -49,6 +49,7 @@ noexcept {
   }
 }
 } // namespace fixed
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define FS_ASSERT(CONDITION, ...)                         \
 if (not (CONDITION)) {                                    \
   safe_print("Fixed-string assertion failed: ",   \
