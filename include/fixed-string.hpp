@@ -41,7 +41,7 @@ void
 safe_print(Args&&... args)
 noexcept {
   try {
-    (std::cerr << ... << std::forward<Args>(args)) << std::endl;
+    (std::cerr << ... << std::forward<Args>(args)) << std::endl; // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
   } catch (...) {
     try {
       std::cerr << "Fixed-string internal error: safe_print failed\n";
@@ -77,7 +77,7 @@ struct String { // NOLINT(altera-struct-pack-align)
   std::array<char, N + 1> _arr; // NOLINT(misc-non-private-member-variables-in-classes) // must be public for C++20's structural type classification
   constexpr explicit String() noexcept : _arr{} {} // zero-initialization (solely for use in constant expressions)
   constexpr String(char const (&str)[N + 1]) noexcept : _arr{arr_from_str<N>(str)} {} // NOLINT(google-explicit-constructor)
-  constexpr explicit String(std::array<char, N + 1>&& str) noexcept : _arr{std::move(str)} { FS_ASSERT(str[N] == '\0', "char array must be null-terminated"); }
+  constexpr explicit String(std::array<char, N + 1>&& str) noexcept : _arr{std::move(str)} { FS_ASSERT(_arr[N] == '\0', "char array must be null-terminated"); }
   constexpr explicit String(char c) noexcept requires (N == 1) { _arr[0] = c; _arr[1] = '\0'; }
   constexpr String(String const&) noexcept = default;
   constexpr String(String&&) noexcept = default;
@@ -103,7 +103,7 @@ bool
 streq(String<N> const& lhs, String<M> const& rhs)
 noexcept {
   if constexpr (N != M) { return false; }
-  return std::equal(lhs.arr.begin(), lhs.arr.end(), rhs.arr.begin());
+  return std::equal(lhs._arr.begin(), lhs._arr.end(), rhs._arr.begin());
 }
 
 template <std::size_t N, std::size_t M>
@@ -120,9 +120,9 @@ String<N + M>
 operator+(String<N> const& lhs, String<M> const& rhs)
 noexcept {
   String<N + M> rtn{}; // sadly must be zero-initialized to use in constant expressions
-  std::copy_n(lhs.arr.begin(), N, rtn.arr.begin());
-  std::copy_n(rhs.arr.begin(), M, rtn.arr.begin() + N);
-  rtn.arr[N + M] = '\0';
+  std::copy_n(lhs._arr.begin(), N, rtn._arr.begin());
+  std::copy_n(rhs._arr.begin(), M, rtn._arr.begin() + N);
+  rtn._arr[N + M] = '\0';
   return rtn;
 }
 
@@ -152,11 +152,11 @@ FS_PURE static
 std::array<char, log10<x> + 2>
 array_itoa()
 noexcept {
-  std::array<char, log10<x> + 2> arr{};
-  arr[log10<x> + 1] = '\0';
+  std::array<char, log10<x> + 2> _arr{};
+  _arr[log10<x> + 1] = '\0';
   unsigned char i{log10<x>};
-  for (auto n{x}; n > 0; n /= 10U) { arr[i--] = static_cast<char>(n % 10U + '0'); }
-  return arr;
+  for (auto n{x}; n > 0; n /= 10U) { _arr[i--] = static_cast<char>(n % 10U + '0'); }
+  return _arr;
 }
 
 template <std::unsigned_integral auto x>
@@ -175,7 +175,7 @@ template <typename T> concept fixed_string = is_fixed_string<T>;
 
 //%%%%%%%%%%%%%%%% iostream interface
 
-#ifndef FSTRING_DISABLE_IO
+#ifndef FS_DISABLE_IO
 #include <iostream>
 namespace fixed {
 template <std::size_t N>
@@ -186,7 +186,13 @@ noexcept {
   return os << fs.c_str();
 }
 } // namespace fixed
-#endif // FSTRING_DISABLE_IO
+#else // FS_DISABLE_IO
+#if (FS_DISABLE_IO == 0)
+#error "Defining FS_DISABLE_IO to 0 doesn't disable its effects; undefine it instead (-UFS_DISABLE_IO)"
+#elif (FS_DISABLE_IO != 1)
+#error "If FS_DISABLE_IO is defined, it must be to 1 (default when the compiler receives only `-DFS_DISABLE_IO`)"
+#endif // FS_DISABLE_IO == ...
+#endif // FS_DISABLE_IO
 
 #undef FS_PURE
 #undef FS_IMPURE
