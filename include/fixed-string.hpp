@@ -73,9 +73,8 @@ noexcept {
 }
 
 template <std::size_t N>
-class String { // NOLINT(altera-struct-pack-align)
-  std::array<char, N + 1> _arr; // NOLINT(misc-non-private-member-variables-in-classes)
- public:
+struct String { // NOLINT(altera-struct-pack-align)
+  std::array<char, N + 1> _arr; // NOLINT(misc-non-private-member-variables-in-classes) // must be public for C++20's structural type classification
   constexpr explicit String() noexcept : _arr{} {} // zero-initialization (solely for use in constant expressions)
   constexpr String(char const (&str)[N + 1]) noexcept : _arr{arr_from_str<N>(str)} {} // NOLINT(google-explicit-constructor)
   constexpr explicit String(std::array<char, N + 1>&& str) noexcept : _arr{std::move(str)} { FS_ASSERT(str[N] == '\0', "char array must be null-terminated"); }
