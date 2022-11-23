@@ -179,7 +179,7 @@ template <typename T> concept fixed_string = is_fixed_string<T>;
 #include <iostream>
 namespace fixed {
 template <std::size_t N>
-[[nodiscard]] [[gnu::always_inline]] inline static
+FS_INLINE static
 std::ostream&
 operator<<(std::ostream& os, String<N> const& fs)
 noexcept {
