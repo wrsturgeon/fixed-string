@@ -19,16 +19,16 @@
 
 #ifdef NDEBUG
 #if (NDEBUG == 0)
-#error "Defining NDEBUG to 0 doesn't in general disable (C libraries vary); undefine it instead (-UNDEBUG)"
+#error Defining NDEBUG to 0 doesn't in general disable (C libraries vary); undefine it instead (-UNDEBUG)
 #elif (NDEBUG != 1)
-#error "If NDEBUG is defined, it must be to 1 (default when the compiler receives only `-DNDEBUG`)"
+#error If NDEBUG is defined, it must be to 1 (default when the compiler receives only `-DNDEBUG`)
 #endif // NDEBUG == ...
 #define FS_ASSERT(CONDITION, ...) static_cast<void>(0)
 #elif defined(FS_NOASSERT)
 #if (FS_NOASSERT == 0)
-#error "Defining FS_NOASSERT to 0 doesn't disable its effects; undefine it instead (-UFS_NOASSERT)"
+#error Defining FS_NOASSERT to 0 doesn't disable its effects; undefine it instead (-UFS_NOASSERT)
 #elif (FS_NOASSERT != 1)
-#error "If FS_NOASSERT is defined, it must be to 1 (default when the compiler receives only `-DFS_NOASSERT`)"
+#error If FS_NOASSERT is defined, it must be to 1 (default when the compiler receives only `-DFS_NOASSERT`)
 #endif // FS_NOASSERT == ...
 #undef FS_NOASSERT
 #define FS_ASSERT(CONDITION, ...) static_cast<void>(0)
@@ -188,9 +188,9 @@ noexcept {
 } // namespace fixed
 #else // FS_DISABLE_IO
 #if (FS_DISABLE_IO == 0)
-#error "Defining FS_DISABLE_IO to 0 doesn't disable its effects; undefine it instead (-UFS_DISABLE_IO)"
+#error Defining FS_DISABLE_IO to 0 doesn't disable its effects; undefine it instead (-UFS_DISABLE_IO)
 #elif (FS_DISABLE_IO != 1)
-#error "If FS_DISABLE_IO is defined, it must be to 1 (default when the compiler receives only `-DFS_DISABLE_IO`)"
+#error If FS_DISABLE_IO is defined, it must be to 1 (default when the compiler receives only `-DFS_DISABLE_IO`)
 #endif // FS_DISABLE_IO == ...
 #endif // FS_DISABLE_IO
 
